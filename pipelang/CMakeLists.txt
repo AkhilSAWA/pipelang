@@ -4,9 +4,6 @@ project(PipeLang
     DESCRIPTION "A DSL compiler for data-processing pipelines"
     LANGUAGES CXX)
 
-# ---------------------------------------------------------------------------
-# Standard / warnings
-# ---------------------------------------------------------------------------
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -58,10 +55,10 @@ target_include_directories(pipelangc PRIVATE
 )
 
 # ---------------------------------------------------------------------------
-# Tests (simple CTest wiring — runs the compiler on example programs)
+# Tests
 # ---------------------------------------------------------------------------
 enable_testing()
-add_test(NAME lex_student_analysis
-         COMMAND pipelangc ${CMAKE_SOURCE_DIR}/examples/student_analysis.pipe --dump-tokens)
 add_test(NAME parse_student_analysis
          COMMAND pipelangc ${CMAKE_SOURCE_DIR}/examples/student_analysis.pipe --dump-ast)
+add_test(NAME parse_sales
+         COMMAND pipelangc ${CMAKE_SOURCE_DIR}/examples/sales.pipe --dump-ast)
