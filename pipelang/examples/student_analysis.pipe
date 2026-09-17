@@ -1,0 +1,9 @@
+// Canonical example from the project spec.
+pipeline StudentAnalysis {
+    input students
+    clean students
+    filter students where marks > 75
+    transform students calculate_grade
+    group students by department
+    output students
+}
