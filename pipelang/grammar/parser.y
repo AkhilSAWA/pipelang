@@ -7,7 +7,6 @@
 #include "pipelang/ast.hpp"
 #include "pipelang/driver.hpp"
 
-int yylex(YYSTYPE* yylval, pipelang::Driver& driver);
 void yyerror(pipelang::Driver& driver, const char* message);
 %}
 
@@ -17,9 +16,18 @@ void yyerror(pipelang::Driver& driver, const char* message);
 #include <vector>
 
 #include "pipelang/ast.hpp"
+
+namespace pipelang {
+class Driver;
+}
+}
+
+%code provides {
+int yylex(YYSTYPE* yylval, pipelang::Driver& driver);
 }
 
 %define parse.error detailed
+%define api.pure full
 
 %parse-param { pipelang::Driver& driver }
 %lex-param   { pipelang::Driver& driver }
