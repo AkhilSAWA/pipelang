@@ -1,8 +1,26 @@
-build/
+# CMake build output
+/build/
+/cmake-build-*/
+CMakeCache.txt
+CMakeFiles/
+CTestTestfile.cmake
+Testing/
+Makefile
+cmake_install.cmake
+
+# Generated parser and lexer files
+/generated/
+parser.cpp
+parser.hpp
+lexer.cpp
+
+# IDE/editor files
+.vscode/
+.idea/
+*.swp
+
+# Compiler artifacts
 *.o
 *.obj
 *.exe
-compile_commands.json
-.vscode/
-.idea/
-generated/
+pipelangc

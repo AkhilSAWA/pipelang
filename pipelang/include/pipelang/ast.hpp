@@ -1,66 +1,93 @@
 #pragma once
-// ============================================================
-// PipeLang AST — minimal node definitions for Phase 2 scaffold
-// ============================================================
+
 #include <memory>
+#include <ostream>
 #include <string>
 #include <vector>
-#include <variant>
-#include <ostream>
 
 namespace pipelang {
 
-// ---------- Operation kinds ----------
-enum class Op {
-    Input, Clean, Filter, Transform,
-    Sort,  Group, Aggregate, Output
+enum class ExprKind {
+    Identifier,
+    Integer,
+    Float,
+    String,
+    Binary
 };
 
-const char* opName(Op o);
+enum class StmtKind {
+    Input,
+    Clean,
+    Filter,
+    Transform,
+    Sort,
+    Group,
+    Aggregate,
+    Output
+};
 
-// ---------- Expressions (used by filter WHERE …) ----------
+enum class SortOrder {
+    Ascending,
+    Descending
+};
+
 struct Expr;
 using ExprPtr = std::unique_ptr<Expr>;
 
 struct Expr {
-    enum class Kind { Ident, Int, Float, String, Binary };
-    Kind kind;
-    std::string sval;        // Ident, String, or operator symbol for Binary
-    long long   ival = 0;
-    double      fval = 0.0;
-    ExprPtr     lhs, rhs;    // Binary
+    ExprKind kind;
+    std::string value;
+    ExprPtr left;
+    ExprPtr right;
 
-    static ExprPtr ident(std::string s);
-    static ExprPtr intLit(long long v);
-    static ExprPtr floatLit(double v);
-    static ExprPtr strLit(std::string s);
-    static ExprPtr bin(std::string op, ExprPtr l, ExprPtr r);
-
-    void print(std::ostream& os) const;
+    Expr(ExprKind kind, std::string value);
+    Expr(ExprKind kind, std::string value, ExprPtr left, ExprPtr right);
 };
 
-// ---------- Statements ----------
-struct Stmt {
-    Op          op;
-    std::string dataset;     // e.g. "students"
-    std::string argument;    // second identifier (transform fn, sort/group key)
-    ExprPtr     predicate;   // for FILTER … WHERE …
-
-    Stmt(Op o, std::string ds) : op(o), dataset(std::move(ds)) {}
-    void print(std::ostream& os, int indent = 0) const;
-};
+struct Stmt;
 using StmtPtr = std::unique_ptr<Stmt>;
 
-// ---------- Pipeline ----------
-struct Pipeline {
-    std::string          name;
-    std::vector<StmtPtr> stmts;
+struct Stmt {
+    StmtKind kind;
+    std::string dataset;
+    std::string argument;
+    SortOrder order = SortOrder::Ascending;
+    ExprPtr expression;
 
-    Pipeline(std::string n, std::vector<StmtPtr> s)
-        : name(std::move(n)), stmts(std::move(s)) {}
-
-    void print(std::ostream& os) const;
+    explicit Stmt(StmtKind kind, std::string dataset);
 };
+
+struct Pipeline {
+    std::string name;
+    std::vector<StmtPtr> statements;
+};
+
 using PipelinePtr = std::unique_ptr<Pipeline>;
 
-} // namespace pipelang
+ExprPtr make_identifier(std::string value);
+ExprPtr make_integer(std::string value);
+ExprPtr make_float(std::string value);
+ExprPtr make_string(std::string value);
+ExprPtr make_binary(std::string op, ExprPtr left, ExprPtr right);
+
+StmtPtr make_input(std::string dataset);
+StmtPtr make_clean(std::string dataset);
+StmtPtr make_filter(std::string dataset, ExprPtr condition);
+StmtPtr make_transform(std::string dataset, std::string function);
+StmtPtr make_sort(std::string dataset, std::string field, SortOrder order);
+StmtPtr make_group(std::string dataset, std::string field);
+StmtPtr make_aggregate(
+    std::string dataset,
+    std::string field,
+    std::string function
+);
+StmtPtr make_output(std::string dataset);
+
+PipelinePtr make_pipeline(
+    std::string name,
+    std::vector<StmtPtr> statements
+);
+
+void print_ast(const Pipeline& pipeline, std::ostream& output);
+
+}  // namespace pipelang

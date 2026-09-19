@@ -1,87 +1,98 @@
-/* ============================================================
- * PipeLang lexical analyzer (Flex, C output)
- * Emits Bison C++ variant symbol_types via make_XXX(...) helpers.
- * ============================================================ */
-
-%option noyywrap nounput noinput
-%option yylineno
+%option noyywrap nodefault yylineno nounput noinput
 
 %{
 #include <string>
-#include <cstdlib>
+
 #include "parser.hpp"
 #include "pipelang/driver.hpp"
 
-/* Shorthand for the generated symbol_type constructors. */
-using yy::parser;
+#define YY_DECL int yylex(YYSTYPE* yylval, pipelang::Driver& driver)
 
-/* Bison declared yylex inside namespace yy; match that here. */
-#undef  YY_DECL
-#define YY_DECL yy::parser::symbol_type yy::yylex(pipelang::Driver& drv)
-
-/* Forward-declare so the generated lexer.cpp sees the same signature. */
-namespace yy { parser::symbol_type yylex(pipelang::Driver& drv); }
-
-/* Track column for nicer error messages (currently unused). */
-static int g_column = 1;
-#define YY_USER_ACTION g_column += yyleng;
+static std::string unquote(const char* text, int length) {
+    return std::string(
+        text + 1,
+        static_cast<std::size_t>(length - 2)
+    );
+}
 %}
 
-DIGIT   [0-9]
-LETTER  [a-zA-Z_]
-ID      {LETTER}({LETTER}|{DIGIT})*
-INT     {DIGIT}+
-FLOAT   {DIGIT}+"."{DIGIT}+
-STRING  \"([^\"\\]|\\.)*\"
+WHITESPACE  [ \t\r]+
+ID          [a-zA-Z_][a-zA-Z0-9_]*
+INTEGER     [0-9]+
+FLOAT       [0-9]+\.[0-9]+
+STRING      \"([^\\\"]|\\.)*\"
 
 %%
 
-"pipeline"      { return parser::make_PIPELINE(); }
-"input"         { return parser::make_INPUT(); }
-"clean"         { return parser::make_CLEAN(); }
-"filter"        { return parser::make_FILTER(); }
-"where"         { return parser::make_WHERE(); }
-"transform"     { return parser::make_TRANSFORM(); }
-"sort"          { return parser::make_SORT(); }
-"group"         { return parser::make_GROUP(); }
-"by"            { return parser::make_BY(); }
-"aggregate"     { return parser::make_AGGREGATE(); }
-"output"        { return parser::make_OUTPUT(); }
-"ascending"     { return parser::make_ASCENDING(); }
-"descending"    { return parser::make_DESCENDING(); }
+{WHITESPACE}                    ;
+\n                              ;
 
-">="            { return parser::make_GE(); }
-"<="            { return parser::make_LE(); }
-"=="            { return parser::make_EQ(); }
-"!="            { return parser::make_NE(); }
-">"             { return parser::make_GT(); }
-"<"             { return parser::make_LT(); }
-"+"             { return parser::make_PLUS(); }
-"-"             { return parser::make_MINUS(); }
-"*"             { return parser::make_STAR(); }
-"/"             { return parser::make_SLASH(); }
+"//"[^\n]*                       ;
+"#"[^\n]*                        ;
+"/*"([^*]|\*+[^*/])*\*+"/"       ;
 
-"{"             { return parser::make_LBRACE(); }
-"}"             { return parser::make_RBRACE(); }
-"("             { return parser::make_LPAREN(); }
-")"             { return parser::make_RPAREN(); }
-","             { return parser::make_COMMA(); }
-";"             { return parser::make_SEMI(); }
+"pipeline"                       return PIPELINE;
+"input"                          return INPUT;
+"clean"                          return CLEAN;
+"filter"                         return FILTER;
+"where"                          return WHERE;
+"transform"                      return TRANSFORM;
+"sort"                           return SORT;
+"group"                          return GROUP;
+"by"                             return BY;
+"aggregate"                      return AGGREGATE;
+"output"                         return OUTPUT;
+"ascending"                      return ASCENDING;
+"descending"                     return DESCENDING;
 
-{FLOAT}         { return parser::make_FLOAT_LIT(std::atof(yytext)); }
-{INT}           { return parser::make_INT_LIT(std::atoi(yytext)); }
-{STRING}        { return parser::make_STRING_LIT(std::string(yytext+1, yyleng-2)); }
-{ID}            { return parser::make_IDENT(std::string(yytext, yyleng)); }
+">="                             return GREATER_EQUAL;
+"<="                             return LESS_EQUAL;
+"=="                             return EQUAL_EQUAL;
+"!="                             return NOT_EQUAL;
+">"                              return GREATER;
+"<"                              return LESS;
+"+"                              return PLUS;
+"-"                              return MINUS;
+"*"                              return STAR;
+"/"                              return SLASH;
 
-"//".*          { /* line comment */ }
-[ \t\r]+        { /* whitespace */ }
-\n              { g_column = 1; }
+{FLOAT} {
+    yylval->text = new std::string(yytext, yyleng);
+    driver.note_token("FLOAT", *yylval->text, yylineno);
+    return FLOAT_LITERAL;
+}
 
-.               { std::fprintf(stderr,
-                    "Lexical error: unexpected '%s' at line %d\n",
-                    yytext, yylineno);
-                }
+{INTEGER} {
+    yylval->text = new std::string(yytext, yyleng);
+    driver.note_token("INTEGER", *yylval->text, yylineno);
+    return INTEGER_LITERAL;
+}
 
-<<EOF>>         { return parser::make_END(); }
+{STRING} {
+    yylval->text = new std::string(unquote(yytext, yyleng));
+    driver.note_token("STRING", *yylval->text, yylineno);
+    return STRING_LITERAL;
+}
+
+{ID} {
+    yylval->text = new std::string(yytext, yyleng);
+    driver.note_token("ID", *yylval->text, yylineno);
+    return IDENTIFIER;
+}
+
+"{"                              return LBRACE;
+"}"                              return RBRACE;
+"("                              return LPAREN;
+")"                              return RPAREN;
+";"                              return SEMICOLON;
+","                              return COMMA;
+
+. {
+    driver.error(
+        yylineno,
+        std::string("unexpected character '") + yytext[0] + "'"
+    );
+    return INVALID;
+}
 
 %%

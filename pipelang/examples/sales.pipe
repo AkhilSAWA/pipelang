@@ -1,11 +1,10 @@
-// Second example exercising sort + aggregate.
+# Includes sorting and aggregation
 pipeline SalesReport {
-    input   sales
-    clean   sales
-    filter  sales where amount >= 1000
-    transform sales normalize_currency
-    sort    sales by amount
-    group   sales by region
-    aggregate sales sum_amount
-    output  sales
+    input sales
+    clean sales
+    filter sales where revenue >= 1000.50
+    sort sales by revenue descending
+    group sales by region
+    aggregate sales by revenue sum
+    output sales
 }

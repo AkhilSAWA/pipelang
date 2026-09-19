@@ -1,10 +1,9 @@
-#!/usr/bin/env bash
-# One-shot build helper.
-set -euo pipefail
-ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-cd "$ROOT"
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
-cmake --build build -j
-echo
-echo "Try:"
-echo "  ./build/pipelangc examples/student_analysis.pipe --dump-ast"
+#!/usr/bin/env sh
+set -eu
+
+root_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+build_dir="$root_dir/build"
+
+cmake -S "$root_dir" -B "$build_dir"
+cmake --build "$build_dir"
+ctest --test-dir "$build_dir" --output-on-failure

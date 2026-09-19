@@ -1,4 +1,4 @@
-// Canonical example from the project spec.
+// Canonical PipeLang example
 pipeline StudentAnalysis {
     input students
     clean students

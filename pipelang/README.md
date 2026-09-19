@@ -1,93 +1,67 @@
 # PipeLang
 
-A domain-specific compiler for describing and optimizing data-processing
-pipelines. Individual Compiler Design Laboratory project.
+PipeLang is a C++20 domain-specific language and compiler prototype for describing data-processing pipelines.
 
-**Phase 2 prototype** — this scaffold gives you a working lexer + parser +
-AST + CLI so you can grow it into the full pipeline described in
-`# PipeLang — Project Context.md`.
-
-```
-PipeLang Source
-  → Flex Lexer         ← implemented (grammar/lexer.l)
-  → Bison Parser       ← implemented (grammar/parser.y)
-  → AST                ← implemented (include/pipelang/ast.hpp)
-  → Semantic Analysis  ← TODO (Phase 2 step 6)
-  → IR                 ← TODO
-  → Dependency + DAG   ← TODO
-  → Optimization       ← Phase 3
-  → Execution          ← Phase 3
+```text
+PipeLang source -> Flex lexer -> Bison parser -> AST
+                -> semantic analysis -> IR -> dependency DAG
+                -> optimization -> execution
 ```
 
-## Layout
+This Phase 2 baseline implements a working Flex lexer, Bison LALR parser, custom C++ AST, command-line driver, examples, and CTest smoke tests.
 
-```
-pipelang/
-├── CMakeLists.txt            build config (finds Flex + Bison)
-├── grammar/
-│   ├── lexer.l               Flex tokens
-│   └── parser.y              Bison grammar → AST
-├── include/pipelang/
-│   ├── ast.hpp               AST node types
-│   └── driver.hpp            compiler driver (owns lexer + result)
-├── src/
-│   ├── main.cpp              CLI entry point
-│   ├── driver.cpp            Flex ↔ Bison glue
-│   └── ast.cpp               AST factories + pretty-printer
-├── examples/
-│   ├── student_analysis.pipe canonical spec example
-│   └── sales.pipe            richer example
-├── tests/                    CTest driven acceptance tests
-├── scripts/build.sh          one-shot build
-└── docs/                     design docs (Phase 1 outputs go here)
-```
+## Requirements
 
-## Prerequisites
+- CMake 3.20+
+- C++20 compiler
+- Flex 2.6+
+- Bison 3.0+
 
-- CMake ≥ 3.16
-- A C++20 compiler (g++ ≥ 10 or clang++ ≥ 12)
-- Flex ≥ 2.6
-- Bison ≥ 3.5
-- (later) Graphviz `dot` in PATH for DAG rendering
-
-On Ubuntu / WSL:
+Ubuntu/Debian:
 
 ```bash
-sudo apt update
-sudo apt install build-essential cmake flex bison graphviz
+sudo apt install build-essential cmake flex bison
 ```
 
-## Build & run
+## Build and test
+
+Run from this `pipelang/` directory:
 
 ```bash
-./scripts/build.sh
-./build/pipelangc examples/student_analysis.pipe --dump-ast
+cmake -S . -B build
+cmake --build build
+ctest --test-dir build --output-on-failure
 ```
 
-Expected output ends with `OK: parsed '…'` and a pretty-printed AST.
+Or:
 
-## Next implementation steps (Phase 2 checklist)
+```bash
+sh scripts/build.sh
+```
 
-1. ~~C++20 + CMake project setup~~ ✅
-2. ~~Flex lexer~~ ✅
-3. ~~Bison parser~~ ✅ (grammar covers all Phase-2 ops)
-4. ~~AST~~ ✅
-5. **Symbol table** — add `include/pipelang/symbol_table.hpp`; track dataset
-   names and their inferred column sets.
-6. **Semantic analysis** — walk the AST, verify every op refers to a declared
-   dataset, and type-check filter predicates.
-7. **IR** — lower AST statements into a flat list of `IROp { kind, dataset,
-   args, predicate }` records under `include/pipelang/ir.hpp`.
-8. **Dependency analysis** — for each IR op, compute reads/writes on datasets
-   and build predecessor edges.
-9. **DAG** — materialize the dependency graph; emit Graphviz `.dot` output
-   for `--dump-dag`.
+## Run
 
-Phase 3 then layers optimization passes, an interpreter execution engine,
-and optional `std::thread`/`std::async` parallel execution for independent
-DAG nodes.
+```bash
+./build/pipelangc examples/student_analysis.pipe
+./build/pipelangc --dump-ast examples/student_analysis.pipe
+./build/pipelangc --dump-tokens --dump-ast examples/sales.pipe
+```
 
-## Development log
+## Supported syntax
 
-Keep a running log at `docs/devlog.md` — one dated entry per work session,
-noting decisions and blockers. This is called out in the project guidelines.
+| Operation | Syntax |
+| --- | --- |
+| Input | `input dataset` |
+| Clean | `clean dataset` |
+| Filter | `filter dataset where expression` |
+| Transform | `transform dataset function` |
+| Sort | `sort dataset by field [ascending\|descending]` |
+| Group | `group dataset by field` |
+| Aggregate | `aggregate dataset by field function` |
+| Output | `output dataset` |
+
+Expressions support identifiers, integer/float/string literals, parentheses, comparison operators, and `+`, `-`, `*`, `/`. A semicolon is optional after a statement.
+
+## Next milestone
+
+The next Phase 2 milestone is semantic analysis using a symbol table, followed by a custom IR and dependency DAG. That DAG will support later optimization, Graphviz visualization, redundancy detection, and possible parallel execution.

@@ -1,64 +1,51 @@
-cmake_minimum_required(VERSION 3.16)
-project(PipeLang
-    VERSION 0.1.0
-    DESCRIPTION "A DSL compiler for data-processing pipelines"
-    LANGUAGES CXX)
+cmake_minimum_required(VERSION 3.20)
+project(PipeLang VERSION 0.1.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Debug)
-endif()
-
-if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-    add_compile_options(-Wall -Wextra -Wpedantic -Wno-unused-parameter)
-endif()
-
-# ---------------------------------------------------------------------------
-# Flex + Bison
-# ---------------------------------------------------------------------------
-find_package(FLEX  REQUIRED)
-find_package(BISON REQUIRED)
-
-set(GEN_DIR ${CMAKE_BINARY_DIR}/generated)
-file(MAKE_DIRECTORY ${GEN_DIR})
+find_package(BISON 3.0 REQUIRED)
+find_package(FLEX 2.6 REQUIRED)
 
 BISON_TARGET(PipeLangParser
-    ${CMAKE_SOURCE_DIR}/grammar/parser.y
-    ${GEN_DIR}/parser.cpp
-    DEFINES_FILE ${GEN_DIR}/parser.hpp)
+    ${CMAKE_CURRENT_SOURCE_DIR}/grammar/parser.y
+    ${CMAKE_CURRENT_BINARY_DIR}/generated/parser.cpp
+    DEFINES_FILE ${CMAKE_CURRENT_BINARY_DIR}/generated/parser.hpp
+)
 
 FLEX_TARGET(PipeLangLexer
-    ${CMAKE_SOURCE_DIR}/grammar/lexer.l
-    ${GEN_DIR}/lexer.cpp)
+    ${CMAKE_CURRENT_SOURCE_DIR}/grammar/lexer.l
+    ${CMAKE_CURRENT_BINARY_DIR}/generated/lexer.cpp
+)
 
 ADD_FLEX_BISON_DEPENDENCY(PipeLangLexer PipeLangParser)
 
-# ---------------------------------------------------------------------------
-# Sources
-# ---------------------------------------------------------------------------
-set(PIPELANG_SOURCES
+add_executable(pipelangc
     src/main.cpp
-    src/ast.cpp
     src/driver.cpp
+    src/ast.cpp
     ${BISON_PipeLangParser_OUTPUTS}
     ${FLEX_PipeLangLexer_OUTPUTS}
 )
 
-add_executable(pipelangc ${PIPELANG_SOURCES})
-
 target_include_directories(pipelangc PRIVATE
-    ${CMAKE_SOURCE_DIR}/include
-    ${GEN_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_BINARY_DIR}/generated
 )
 
-# ---------------------------------------------------------------------------
-# Tests
-# ---------------------------------------------------------------------------
+target_compile_options(pipelangc PRIVATE
+    $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall -Wextra -Wpedantic>
+)
+
 enable_testing()
-add_test(NAME parse_student_analysis
-         COMMAND pipelangc ${CMAKE_SOURCE_DIR}/examples/student_analysis.pipe --dump-ast)
-add_test(NAME parse_sales
-         COMMAND pipelangc ${CMAKE_SOURCE_DIR}/examples/sales.pipe --dump-ast)
+
+add_test(
+    NAME parse_student_analysis
+    COMMAND pipelangc ${CMAKE_CURRENT_SOURCE_DIR}/examples/student_analysis.pipe
+)
+
+add_test(
+    NAME parse_sales
+    COMMAND pipelangc ${CMAKE_CURRENT_SOURCE_DIR}/examples/sales.pipe
+)

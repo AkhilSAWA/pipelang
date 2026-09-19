@@ -1,45 +1,76 @@
-// ============================================================
-// PipeLang compiler — CLI entry point
-//   pipelangc <file.pipe> [--dump-tokens] [--dump-ast]
-// ============================================================
-#include "pipelang/driver.hpp"
-
 #include <iostream>
 #include <string>
-#include <vector>
 
-static void usage(const char* prog) {
-    std::cerr <<
-        "PipeLang compiler (prototype)\n"
-        "Usage: " << prog << " <file.pipe> [--dump-tokens] [--dump-ast]\n";
+#include "pipelang/ast.hpp"
+#include "pipelang/driver.hpp"
+
+namespace {
+
+void print_usage(const char* program) {
+    std::cout
+        << "Usage: "
+        << program
+        << " [--dump-tokens] [--dump-ast] <source.pipe>\n";
 }
 
+}  // namespace
+
 int main(int argc, char** argv) {
-    if (argc < 2) { usage(argv[0]); return 2; }
+    bool dump_tokens = false;
+    bool dump_ast = false;
+    std::string input_file;
 
-    pipelang::Driver drv;
-    std::string path;
+    for (int index = 1; index < argc; ++index) {
+        const std::string argument = argv[index];
 
-    for (int i = 1; i < argc; ++i) {
-        std::string a = argv[i];
-        if      (a == "--dump-tokens") drv.dump_tokens = true;
-        else if (a == "--dump-ast")    drv.dump_ast    = true;
-        else if (a == "-h" || a == "--help") { usage(argv[0]); return 0; }
-        else                                   path = a;
+        if (argument == "--dump-tokens") {
+            dump_tokens = true;
+        } else if (argument == "--dump-ast") {
+            dump_ast = true;
+        } else if (argument == "--help" || argument == "-h") {
+            print_usage(argv[0]);
+            return 0;
+        } else if (!argument.empty() && argument.front() == '-') {
+            std::cerr << "Unknown option: " << argument << '\n';
+            print_usage(argv[0]);
+            return 2;
+        } else if (input_file.empty()) {
+            input_file = argument;
+        } else {
+            std::cerr << "Only one source file is supported.\n";
+            return 2;
+        }
     }
-    if (path.empty()) { usage(argv[0]); return 2; }
 
-    int rc = drv.parse_file(path);
-    if (rc != 0) {
-        std::cerr << "compilation failed (parse rc=" << rc << ")\n";
-        return rc;
+    if (input_file.empty()) {
+        print_usage(argv[0]);
+        return 2;
     }
 
-    if (drv.dump_ast && drv.pipeline()) {
-        std::cout << "=== AST ===\n";
-        drv.pipeline()->print(std::cout);
+    pipelang::Driver driver;
+    driver.set_dump_tokens(dump_tokens);
+
+    if (!driver.parse_file(input_file)) {
+        for (const auto& error : driver.errors()) {
+            std::cerr << "error: " << error << '\n';
+        }
+        return 1;
     }
 
-    std::cout << "OK: parsed '" << path << "'\n";
+    if (dump_tokens) {
+        driver.print_tokens(std::cout);
+    }
+
+    if (dump_ast && driver.program()) {
+        pipelang::print_ast(*driver.program(), std::cout);
+    }
+
+    if (!dump_tokens && !dump_ast) {
+        std::cout
+            << "Parsed pipeline: "
+            << driver.program()->name
+            << '\n';
+    }
+
     return 0;
 }
