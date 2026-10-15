@@ -53,8 +53,9 @@ struct Stmt {
     std::string argument;
     SortOrder order = SortOrder::Ascending;
     ExprPtr expression;
+    int line = 0;  // source line of the statement keyword
 
-    explicit Stmt(StmtKind kind, std::string dataset);
+    explicit Stmt(StmtKind kind, std::string dataset, int line);
 };
 
 struct Pipeline {
@@ -70,18 +71,19 @@ ExprPtr make_float(std::string value);
 ExprPtr make_string(std::string value);
 ExprPtr make_binary(std::string op, ExprPtr left, ExprPtr right);
 
-StmtPtr make_input(std::string dataset);
-StmtPtr make_clean(std::string dataset);
-StmtPtr make_filter(std::string dataset, ExprPtr condition);
-StmtPtr make_transform(std::string dataset, std::string function);
-StmtPtr make_sort(std::string dataset, std::string field, SortOrder order);
-StmtPtr make_group(std::string dataset, std::string field);
+StmtPtr make_input(std::string dataset, int line);
+StmtPtr make_clean(std::string dataset, int line);
+StmtPtr make_filter(std::string dataset, ExprPtr condition, int line);
+StmtPtr make_transform(std::string dataset, std::string function, int line);
+StmtPtr make_sort(std::string dataset, std::string field, SortOrder order, int line);
+StmtPtr make_group(std::string dataset, std::string field, int line);
 StmtPtr make_aggregate(
     std::string dataset,
     std::string field,
-    std::string function
+    std::string function,
+    int line
 );
-StmtPtr make_output(std::string dataset);
+StmtPtr make_output(std::string dataset, int line);
 
 PipelinePtr make_pipeline(
     std::string name,

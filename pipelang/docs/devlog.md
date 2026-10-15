@@ -23,3 +23,19 @@
 - Add a symbol table and input-before-use semantic validation.
 - Lower AST operations to a custom intermediate representation.
 - Create dependency edges and a DAG for ordering and parallelization analysis.
+## 2026-10-15 — Hardening: source lines, golden tests, CI
+- Enabled Bison `%locations` with the pure parser; the lexer now updates
+  `yylloc` from `yylineno`, and `yyerror` reports the offending line.
+- Added `Stmt::line` to the AST; every statement factory takes the line
+  from the grammar rule location.
+- Semantic errors and duplicate-input messages now report source lines
+  (with the first declaration line for duplicates); the symbol table
+  stores declaration lines.
+- Expanded the test suite from 6 to 15 CTest cases: exact-output golden
+  tests for tokens/AST/IR/DAG/symbols, parallel-branch DAG, arithmetic
+  precedence, comment handling, undeclared output, invalid character,
+  and missing-where syntax error. Invalid tests assert the diagnostic
+  line via PASS_REGULAR_EXPRESSION (note: WILL_FAIL inverts a regex
+  match, so the two must not be combined).
+- Added a GitHub Actions workflow that builds and runs the suite on
+  every push and pull request.

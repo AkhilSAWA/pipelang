@@ -1,0 +1,7 @@
+Intermediate Representation
+[0] INPUT dataset=students
+[1] CLEAN dataset=students
+[2] FILTER dataset=students condition=(marks > 75)
+[3] TRANSFORM dataset=students function=calculate_grade
+[4] GROUP dataset=students field=department
+[5] OUTPUT dataset=students

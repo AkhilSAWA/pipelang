@@ -1,0 +1,5 @@
+pipeline Precedence {
+    input metrics
+    filter metrics where alpha + beta * 2 > 10
+    output metrics
+}

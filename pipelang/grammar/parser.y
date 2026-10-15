@@ -7,7 +7,11 @@
 #include "pipelang/ast.hpp"
 #include "pipelang/driver.hpp"
 
-void yyerror(pipelang::Driver& driver, const char* message);
+/* YYLTYPE is defined later in parser.hpp; a forward declaration is enough
+   for the pointer parameters used here. */
+struct YYLTYPE;
+
+void yyerror(YYLTYPE* location, pipelang::Driver& driver, const char* message);
 %}
 
 %code requires {
@@ -23,9 +27,12 @@ class Driver;
 }
 
 %code provides {
-int yylex(YYSTYPE* yylval, pipelang::Driver& driver);
+/* With %locations and a pure parser, Bison passes the token location
+   to the lexer and to yyerror. */
+int yylex(YYSTYPE* yylval, YYLTYPE* yylloc, pipelang::Driver& driver);
 }
 
+%locations
 %define parse.error detailed
 %define api.pure full
 
@@ -101,21 +108,21 @@ statement
     : INPUT IDENTIFIER
       {
           $$ = new pipelang::StmtPtr(
-              pipelang::make_input(*$2)
+              pipelang::make_input(*$2, @$.first_line)
           );
           delete $2;
       }
     | CLEAN IDENTIFIER
       {
           $$ = new pipelang::StmtPtr(
-              pipelang::make_clean(*$2)
+              pipelang::make_clean(*$2, @$.first_line)
           );
           delete $2;
       }
     | FILTER IDENTIFIER WHERE expression
       {
           $$ = new pipelang::StmtPtr(
-              pipelang::make_filter(*$2, std::move(*$4))
+              pipelang::make_filter(*$2, std::move(*$4), @$.first_line)
           );
           delete $2;
           delete $4;
@@ -123,7 +130,7 @@ statement
     | TRANSFORM IDENTIFIER IDENTIFIER
       {
           $$ = new pipelang::StmtPtr(
-              pipelang::make_transform(*$2, *$3)
+              pipelang::make_transform(*$2, *$3, @$.first_line)
           );
           delete $2;
           delete $3;
@@ -131,7 +138,7 @@ statement
     | SORT IDENTIFIER BY IDENTIFIER order
       {
           $$ = new pipelang::StmtPtr(
-              pipelang::make_sort(*$2, *$4, $5)
+              pipelang::make_sort(*$2, *$4, $5, @$.first_line)
           );
           delete $2;
           delete $4;
@@ -139,7 +146,7 @@ statement
     | GROUP IDENTIFIER BY IDENTIFIER
       {
           $$ = new pipelang::StmtPtr(
-              pipelang::make_group(*$2, *$4)
+              pipelang::make_group(*$2, *$4, @$.first_line)
           );
           delete $2;
           delete $4;
@@ -147,7 +154,7 @@ statement
     | AGGREGATE IDENTIFIER BY IDENTIFIER IDENTIFIER
       {
           $$ = new pipelang::StmtPtr(
-              pipelang::make_aggregate(*$2, *$4, *$5)
+              pipelang::make_aggregate(*$2, *$4, *$5, @$.first_line)
           );
           delete $2;
           delete $4;
@@ -156,7 +163,7 @@ statement
     | OUTPUT IDENTIFIER
       {
           $$ = new pipelang::StmtPtr(
-              pipelang::make_output(*$2)
+              pipelang::make_output(*$2, @$.first_line)
           );
           delete $2;
       }
@@ -341,6 +348,7 @@ primary
 
 %%
 
-void yyerror(pipelang::Driver& driver, const char* message) {
-    driver.error(0, message);
+void yyerror(YYLTYPE* location, pipelang::Driver& driver, const char* message) {
+    const int line = location != nullptr ? location->first_line : 0;
+    driver.error(line, message);
 }

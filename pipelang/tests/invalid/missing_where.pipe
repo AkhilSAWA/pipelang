@@ -1,0 +1,5 @@
+pipeline MissingWhere {
+    input sales
+    filter sales revenue > 10
+    output sales
+}

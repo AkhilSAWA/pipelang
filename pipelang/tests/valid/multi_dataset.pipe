@@ -1,0 +1,10 @@
+pipeline MultiDataset {
+    input orders
+    input customers
+    clean orders
+    clean customers
+    filter orders where amount > 100
+    group customers by region
+    output orders
+    output customers
+}

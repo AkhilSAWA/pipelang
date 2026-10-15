@@ -1,0 +1,22 @@
+Pipeline DAG
+Nodes:
+[0] INPUT dataset=orders
+[1] INPUT dataset=customers
+[2] CLEAN dataset=orders
+[3] CLEAN dataset=customers
+[4] FILTER dataset=orders
+[5] GROUP dataset=customers
+[6] OUTPUT dataset=orders
+[7] OUTPUT dataset=customers
+Edges:
+0 -> 2
+1 -> 3
+2 -> 4
+3 -> 5
+4 -> 6
+5 -> 7
+Execution levels:
+Level 0: [0] [1]
+Level 1: [2] [3]
+Level 2: [4] [5]
+Level 3: [6] [7]

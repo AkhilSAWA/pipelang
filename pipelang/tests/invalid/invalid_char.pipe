@@ -1,0 +1,5 @@
+pipeline InvalidChar {
+    input sales
+    filter sales where amount > @100
+    output sales
+}

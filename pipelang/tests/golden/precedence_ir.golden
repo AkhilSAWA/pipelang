@@ -1,0 +1,4 @@
+Intermediate Representation
+[0] INPUT dataset=metrics
+[1] FILTER dataset=metrics condition=((alpha + (beta * 2)) > 10)
+[2] OUTPUT dataset=metrics

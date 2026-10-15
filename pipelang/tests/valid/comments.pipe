@@ -1,0 +1,8 @@
+// Full-line comment before the pipeline.
+pipeline Comments {
+    input logs # trailing comment
+    /* block comment
+       spanning two lines */
+    clean logs
+    output logs
+}

@@ -14,22 +14,22 @@ SemanticResult analyze_semantics(const Pipeline& pipeline) {
             const Symbol* existing = result.symbols.find(statement.dataset);
             if (existing != nullptr) {
                 result.errors.push_back({
-                    index,
+                    statement.line,
                     "duplicate input declaration for dataset '" +
-                        statement.dataset + "'; first declared at statement " +
-                        std::to_string(existing->declaration_index + 1)
+                        statement.dataset + "'; first declared at line " +
+                        std::to_string(existing->declaration_line)
                 });
             } else {
-                result.symbols.insert(statement.dataset, index);
+                result.symbols.insert(statement.dataset, index, statement.line);
             }
             continue;
         }
 
         if (!result.symbols.contains(statement.dataset)) {
             result.errors.push_back({
-                index,
-                "dataset '" + statement.dataset + "' is used by an operation "
-                "before it is declared with input"
+                statement.line,
+                "dataset '" + statement.dataset + "' is used by an operation " +
+                    "before it is declared with input"
             });
         }
     }
@@ -39,8 +39,12 @@ SemanticResult analyze_semantics(const Pipeline& pipeline) {
 
 void print_semantic_errors(const SemanticResult& result, std::ostream& output) {
     for (const SemanticError& error : result.errors) {
-        output << "semantic error at statement " << error.statement_index + 1
-               << ": " << error.message << '\n';
+        if (error.line > 0) {
+            output << "semantic error at line " << error.line << ": "
+                   << error.message << '\n';
+        } else {
+            output << "semantic error: " << error.message << '\n';
+        }
     }
 }
 

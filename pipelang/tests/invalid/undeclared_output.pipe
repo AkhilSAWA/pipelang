@@ -1,0 +1,4 @@
+pipeline UndeclaredOutput {
+    input sales
+    output inventory
+}

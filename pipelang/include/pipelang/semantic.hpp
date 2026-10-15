@@ -11,7 +11,7 @@
 namespace pipelang {
 
 struct SemanticError {
-    std::size_t statement_index = 0;
+    int line = 0;
     std::string message;
 };
 

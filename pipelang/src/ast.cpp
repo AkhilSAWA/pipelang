@@ -18,8 +18,8 @@ Expr::Expr(
       left(std::move(left)),
       right(std::move(right)) {}
 
-Stmt::Stmt(StmtKind kind, std::string dataset)
-    : kind(kind), dataset(std::move(dataset)) {}
+Stmt::Stmt(StmtKind kind, std::string dataset, int line)
+    : kind(kind), dataset(std::move(dataset)), line(line) {}
 
 ExprPtr make_identifier(std::string value) {
     return std::make_unique<Expr>(ExprKind::Identifier, std::move(value));
@@ -46,27 +46,29 @@ ExprPtr make_binary(std::string op, ExprPtr left, ExprPtr right) {
     );
 }
 
-StmtPtr make_input(std::string dataset) {
-    return std::make_unique<Stmt>(StmtKind::Input, std::move(dataset));
+StmtPtr make_input(std::string dataset, int line) {
+    return std::make_unique<Stmt>(StmtKind::Input, std::move(dataset), line);
 }
 
-StmtPtr make_clean(std::string dataset) {
-    return std::make_unique<Stmt>(StmtKind::Clean, std::move(dataset));
+StmtPtr make_clean(std::string dataset, int line) {
+    return std::make_unique<Stmt>(StmtKind::Clean, std::move(dataset), line);
 }
 
-StmtPtr make_filter(std::string dataset, ExprPtr condition) {
+StmtPtr make_filter(std::string dataset, ExprPtr condition, int line) {
     auto statement = std::make_unique<Stmt>(
         StmtKind::Filter,
-        std::move(dataset)
+        std::move(dataset),
+        line
     );
     statement->expression = std::move(condition);
     return statement;
 }
 
-StmtPtr make_transform(std::string dataset, std::string function) {
+StmtPtr make_transform(std::string dataset, std::string function, int line) {
     auto statement = std::make_unique<Stmt>(
         StmtKind::Transform,
-        std::move(dataset)
+        std::move(dataset),
+        line
     );
     statement->argument = std::move(function);
     return statement;
@@ -75,21 +77,24 @@ StmtPtr make_transform(std::string dataset, std::string function) {
 StmtPtr make_sort(
     std::string dataset,
     std::string field,
-    SortOrder order
+    SortOrder order,
+    int line
 ) {
     auto statement = std::make_unique<Stmt>(
         StmtKind::Sort,
-        std::move(dataset)
+        std::move(dataset),
+        line
     );
     statement->argument = std::move(field);
     statement->order = order;
     return statement;
 }
 
-StmtPtr make_group(std::string dataset, std::string field) {
+StmtPtr make_group(std::string dataset, std::string field, int line) {
     auto statement = std::make_unique<Stmt>(
         StmtKind::Group,
-        std::move(dataset)
+        std::move(dataset),
+        line
     );
     statement->argument = std::move(field);
     return statement;
@@ -98,18 +103,20 @@ StmtPtr make_group(std::string dataset, std::string field) {
 StmtPtr make_aggregate(
     std::string dataset,
     std::string field,
-    std::string function
+    std::string function,
+    int line
 ) {
     auto statement = std::make_unique<Stmt>(
         StmtKind::Aggregate,
-        std::move(dataset)
+        std::move(dataset),
+        line
     );
     statement->argument = std::move(field) + " using " + std::move(function);
     return statement;
 }
 
-StmtPtr make_output(std::string dataset) {
-    return std::make_unique<Stmt>(StmtKind::Output, std::move(dataset));
+StmtPtr make_output(std::string dataset, int line) {
+    return std::make_unique<Stmt>(StmtKind::Output, std::move(dataset), line);
 }
 
 PipelinePtr make_pipeline(

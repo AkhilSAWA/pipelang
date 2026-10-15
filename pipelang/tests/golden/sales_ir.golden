@@ -1,0 +1,8 @@
+Intermediate Representation
+[0] INPUT dataset=sales
+[1] CLEAN dataset=sales
+[2] FILTER dataset=sales condition=(revenue >= 1000.50)
+[3] SORT dataset=sales field=revenue order=descending
+[4] GROUP dataset=sales field=region
+[5] AGGREGATE dataset=sales field=revenue function=sum
+[6] OUTPUT dataset=sales

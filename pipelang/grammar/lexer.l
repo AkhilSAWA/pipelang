@@ -6,7 +6,17 @@
 #include "parser.hpp"
 #include "pipelang/driver.hpp"
 
-#define YY_DECL int yylex(YYSTYPE* yylval, pipelang::Driver& driver)
+/* Bison passes the token location (YYLTYPE) because %locations is enabled. */
+#define YY_DECL int yylex(YYSTYPE* yylval, YYLTYPE* yylloc, pipelang::Driver& driver)
+
+/* Give every token a source line before its rule action runs. yylineno is
+   maintained by flex via %option yylineno. */
+#define YY_USER_ACTION { \
+    if (yylloc != nullptr) { \
+        yylloc->first_line = yylineno; \
+        yylloc->last_line = yylineno; \
+    } \
+}
 
 static std::string unquote(const char* text, int length) {
     return std::string(

@@ -1,0 +1,24 @@
+Pipeline DAG
+Nodes:
+[0] INPUT dataset=sales
+[1] CLEAN dataset=sales
+[2] FILTER dataset=sales
+[3] SORT dataset=sales
+[4] GROUP dataset=sales
+[5] AGGREGATE dataset=sales
+[6] OUTPUT dataset=sales
+Edges:
+0 -> 1
+1 -> 2
+2 -> 3
+3 -> 4
+4 -> 5
+5 -> 6
+Execution levels:
+Level 0: [0]
+Level 1: [1]
+Level 2: [2]
+Level 3: [3]
+Level 4: [4]
+Level 5: [5]
+Level 6: [6]

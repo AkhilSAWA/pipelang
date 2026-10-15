@@ -7,14 +7,18 @@
 
 namespace pipelang {
 
-bool SymbolTable::insert(std::string name, std::size_t declaration_index) {
+bool SymbolTable::insert(
+    std::string name,
+    std::size_t declaration_index,
+    int declaration_line
+) {
     // Copy the key first: argument evaluation order is unspecified, so using
     // `name` as the key and `std::move(name)` in the same call can leave the
     // key empty (GCC evaluates right-to-left).
     std::string key = name;
     const auto result = symbols_.emplace(
         std::move(key),
-        Symbol{std::move(name), declaration_index}
+        Symbol{std::move(name), declaration_index, declaration_line}
     );
     return result.second;
 }
