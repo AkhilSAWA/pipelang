@@ -1,0 +1,57 @@
+# PipeLang Phase 2 Progress Report
+
+## Scope
+
+Phase 2 extends the Phase 1 lexer, parser, AST, and compiler driver with semantic validation and a structured compilation pipeline.
+
+## Implemented modules
+
+| Module | Purpose | Status |
+|---|---|---|
+| Symbol table | Records datasets introduced by `input` | Complete |
+| Semantic analyzer | Rejects use-before-input and duplicate inputs | Complete |
+| Intermediate representation | Converts AST statements into uniform instructions | Complete |
+| Dependency analyzer | Links consecutive operations on each dataset | Complete |
+| Pipeline DAG | Builds dependency nodes, edges, and execution levels | Complete |
+| CLI integration | Adds symbol, IR, and DAG dump commands | Complete |
+| Automated tests | Covers valid programs and semantic failures | Complete |
+
+## Commands
+
+```bash
+cmake -S . -B build
+cmake --build build
+ctest --test-dir build --output-on-failure
+
+./build/pipelangc --dump-symbols examples/sales.pipe
+./build/pipelangc --dump-ir examples/sales.pipe
+./build/pipelangc --dump-dag examples/sales.pipe
+```
+
+## Functional flow
+
+1. Flex tokenizes the source.
+2. Bison parses tokens into the custom AST.
+3. The semantic analyzer constructs the symbol table and validates dataset usage.
+4. The IR generator lowers AST statements into uniform instructions.
+5. Dependency analysis connects operations that act on the same dataset.
+6. The DAG calculates topological execution levels for future scheduling.
+
+## Intermediate result for `sales.pipe`
+
+```text
+Intermediate Representation
+[0] INPUT dataset=sales
+[1] CLEAN dataset=sales
+[2] FILTER dataset=sales condition=(revenue >= 1000.50)
+[3] SORT dataset=sales field=revenue order=descending
+[4] GROUP dataset=sales field=region
+[5] AGGREGATE dataset=sales field=revenue function=sum
+[6] OUTPUT dataset=sales
+```
+
+The resulting graph has seven nodes and six edges, forming a valid linear dependency chain for the `sales` dataset.
+
+## Remaining Phase 3 work
+
+Execution, optimization passes, Graphviz export, and parallel scheduling are intentionally outside the Phase 2 scope.

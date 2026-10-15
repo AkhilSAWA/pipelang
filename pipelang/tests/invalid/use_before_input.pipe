@@ -1,0 +1,5 @@
+pipeline InvalidUse {
+    clean students
+    input students
+    output students
+}
