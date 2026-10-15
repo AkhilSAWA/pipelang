@@ -6,7 +6,10 @@
 #include "parser.hpp"
 #include "pipelang/driver.hpp"
 
-#define YY_DECL int yylex(YYSTYPE* yylval, pipelang::Driver& driver)
+#define YY_DECL int yylex(YYSTYPE* yylval, YYLTYPE* yylloc, pipelang::Driver& driver)
+#define YY_USER_ACTION \
+    yylloc->first_line = yylineno; \
+    yylloc->last_line = yylineno;
 
 static std::string unquote(const char* text, int length) {
     return std::string(

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <memory>
 #include <ostream>
 #include <string>
@@ -52,6 +53,7 @@ struct Stmt {
     std::string dataset;
     std::string argument;
     SortOrder order = SortOrder::Ascending;
+    std::size_t line = 0;
     ExprPtr expression;
 
     explicit Stmt(StmtKind kind, std::string dataset);

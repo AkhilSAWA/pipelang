@@ -7,10 +7,11 @@
 
 namespace pipelang {
 
-bool SymbolTable::insert(std::string name, std::size_t declaration_index) {
+bool SymbolTable::insert(std::string name, std::size_t declaration_line) {
+    const std::string key = name;
     const auto result = symbols_.emplace(
-        name,
-        Symbol{std::move(name), declaration_index}
+        key,
+        Symbol{std::move(name), declaration_line}
     );
     return result.second;
 }
@@ -31,15 +32,15 @@ void SymbolTable::print(std::ostream& output) const {
         ordered.push_back(&entry.second);
     }
     std::sort(ordered.begin(), ordered.end(), [](const Symbol* left, const Symbol* right) {
-        return left->declaration_index < right->declaration_index;
+        return left->declaration_line < right->declaration_line;
     });
 
     output << "Symbol Table\n"
            << std::left << std::setw(20) << "Dataset"
-           << "Declaration statement\n";
+           << "Declared line\n";
     for (const Symbol* symbol : ordered) {
         output << std::left << std::setw(20) << symbol->name
-               << symbol->declaration_index + 1 << '\n';
+               << symbol->declaration_line << '\n';
     }
 }
 
