@@ -14,13 +14,13 @@ jobs:
       - name: Install build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake g++ flex bison
+          sudo apt-get install -y cmake g++ flex bison graphviz
 
       - name: Configure
-        run: cmake -S pipelang -B pipelang/build
+        run: cmake -S pipelang -B pipelang/build -DPIPELANG_WERROR=ON
 
       - name: Build
         run: cmake --build pipelang/build --parallel
 
       - name: Run tests
-        run: ctest --test-dir pipelang/build --output-on-failure
+        run: ctest --test-dir pipelang/build --output-on-failure --parallel 4

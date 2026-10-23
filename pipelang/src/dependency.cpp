@@ -1,5 +1,6 @@
 #include "pipelang/dependency.hpp"
 
+#include <string>
 #include <unordered_map>
 
 namespace pipelang {
@@ -17,16 +18,6 @@ std::vector<DependencyEdge> analyze_dependencies(const IRProgram& program) {
     }
 
     return edges;
-}
-
-void print_dependencies(
-    const std::vector<DependencyEdge>& edges,
-    std::ostream& output
-) {
-    output << "Dependency Edges\n";
-    for (const DependencyEdge& edge : edges) {
-        output << edge.from << " -> " << edge.to << '\n';
-    }
 }
 
 }  // namespace pipelang

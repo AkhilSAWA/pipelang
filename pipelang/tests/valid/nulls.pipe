@@ -1,0 +1,5 @@
+pipeline Nulls {
+    input scores
+    filter scores where marks / bonus > 20 or bonus != 5
+    output scores
+}

@@ -1,0 +1,5 @@
+Intermediate Representation
+[0] INPUT dataset=students
+[1] FILTER dataset=students condition=(((marks >= 60) and (attendance > 0.75)) or (name == "topper"))
+[2] FILTER dataset=students condition=(delta > -5)
+[3] OUTPUT dataset=students

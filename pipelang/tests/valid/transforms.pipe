@@ -1,0 +1,8 @@
+pipeline Transforms {
+    input scores
+    sort scores by marks descending
+    transform scores add_row_number
+    transform scores calculate_grade
+    transform scores uppercase
+    output scores
+}

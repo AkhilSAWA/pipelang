@@ -1,0 +1,5 @@
+pipeline TypeMismatch {
+    input sales
+    filter sales where 100 == "high"
+    output sales
+}

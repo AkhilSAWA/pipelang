@@ -1,0 +1,10 @@
+Pipeline: StudentAnalysis
+  Input dataset=students line=3
+  Clean dataset=students line=4
+  Filter dataset=students line=5
+    Binary: >
+      Identifier: marks
+      Integer: 75
+  Transform dataset=students function=calculate_grade line=6
+  Group dataset=students field=department line=7
+  Output dataset=students line=8

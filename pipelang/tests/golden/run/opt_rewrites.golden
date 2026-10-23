@@ -1,0 +1,8 @@
+Output scores (6 rows)
+name,team,marks,bonus,grade
+Grace,Green,99,5,A
+Asha,Red,91,5,A
+Divya,Green,85,,B
+Hugo,Red,72,4,C
+Ben,Blue,72,0,C
+Elif,Blue,64,2,D

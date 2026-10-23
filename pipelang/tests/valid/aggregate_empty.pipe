@@ -1,0 +1,6 @@
+pipeline AggregateEmpty {
+    input scores
+    filter scores where marks > 1000
+    aggregate scores by marks avg
+    output scores
+}

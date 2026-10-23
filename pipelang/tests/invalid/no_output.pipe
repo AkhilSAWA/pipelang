@@ -1,0 +1,4 @@
+pipeline NoOutput {
+    input sales
+    clean sales
+}

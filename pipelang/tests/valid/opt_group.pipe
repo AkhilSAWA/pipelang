@@ -1,0 +1,6 @@
+pipeline GroupOrder {
+    input scores
+    sort scores by team descending
+    group scores by team
+    output scores
+}

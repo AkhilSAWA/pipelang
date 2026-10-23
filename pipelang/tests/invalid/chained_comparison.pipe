@@ -1,0 +1,5 @@
+pipeline ChainedComparison {
+    input sales
+    filter sales where 1 < revenue < 10
+    output sales
+}

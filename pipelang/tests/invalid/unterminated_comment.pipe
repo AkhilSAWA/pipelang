@@ -1,0 +1,5 @@
+pipeline UnterminatedComment {
+    input sales
+    /* this comment never ends
+    output sales
+}

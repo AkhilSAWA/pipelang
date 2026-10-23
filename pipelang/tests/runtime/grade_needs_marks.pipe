@@ -1,0 +1,5 @@
+pipeline GradeNeedsMarks {
+    input teams
+    transform teams calculate_grade
+    output teams
+}

@@ -1,0 +1,4 @@
+pipeline Ragged {
+    input ragged
+    output ragged
+}

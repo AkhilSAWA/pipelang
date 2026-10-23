@@ -1,0 +1,23 @@
+Optimization
+[constant-folding] line 9: `(amount > (50 * 2))` -> `(amount > 100)`
+[dead-code] line 5: removed all 3 operations on dataset 'returns', which is never output
+[filter-pushdown] line 9: moved filter on 'orders' before sort (line 8), clean (line 7) so later operations see fewer rows
+[filter-pushdown] line 10: moved filter on 'orders' before sort (line 8), clean (line 7) so later operations see fewer rows
+[filter-pushdown] line 16: moved filter on 'customers' before clean (line 15) so later operations see fewer rows
+[filter-merge] line 10: merged filter (line 10) into filter (line 9) on 'orders'
+[redundant-clean] line 17: removed clean on 'customers'; the rows are already clean since line 15
+[redundant-sort] line 8: removed sort of 'orders' by 'amount': aggregate (line 12) does not depend on row order
+Instructions: 18 -> 12
+Optimized Intermediate Representation
+[0] INPUT dataset=orders
+[1] INPUT dataset=customers
+[2] FILTER dataset=orders condition=((amount > 100) and (status == "delivered"))
+[3] CLEAN dataset=orders
+[4] GROUP dataset=orders field=region
+[5] AGGREGATE dataset=orders field=amount function=sum
+[6] OUTPUT dataset=orders
+[7] FILTER dataset=customers condition=(age >= 18)
+[8] CLEAN dataset=customers
+[9] TRANSFORM dataset=customers function=uppercase
+[10] SORT dataset=customers field=name order=ascending
+[11] OUTPUT dataset=customers

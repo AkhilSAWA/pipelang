@@ -1,0 +1,5 @@
+pipeline MissingColumn {
+    input scores
+    filter scores where points > 3
+    output scores
+}

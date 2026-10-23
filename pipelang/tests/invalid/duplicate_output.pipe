@@ -1,0 +1,5 @@
+pipeline DuplicateOutput {
+    input sales
+    output sales
+    output sales
+}

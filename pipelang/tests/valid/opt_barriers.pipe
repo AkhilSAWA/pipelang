@@ -1,0 +1,13 @@
+pipeline Barriers {
+    input scores
+    sort scores by marks descending
+    transform scores add_row_number
+    filter scores where row_number <= 5
+    transform scores calculate_grade
+    filter scores where grade == "A" or marks < 70
+    transform scores uppercase
+    filter scores where team != "BLUE"
+    clean scores
+    sort scores by name
+    output scores
+}

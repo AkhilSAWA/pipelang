@@ -1,0 +1,9 @@
+pipeline Rewrites {
+    input scores
+    sort scores by marks
+    transform scores calculate_grade
+    sort scores by name descending
+    filter scores where marks >= 60
+    sort scores by marks descending
+    output scores
+}

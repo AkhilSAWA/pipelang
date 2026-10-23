@@ -1,0 +1,4 @@
+pipeline CsvEdge {
+    input edge
+    output edge
+}

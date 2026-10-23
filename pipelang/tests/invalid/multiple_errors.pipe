@@ -1,0 +1,6 @@
+pipeline MultipleErrors {
+    clean orders
+    input sales
+    filter sales where region > 5 and revenue
+    output sales
+}

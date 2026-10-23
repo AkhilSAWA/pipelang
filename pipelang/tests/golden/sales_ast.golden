@@ -1,0 +1,11 @@
+Pipeline: SalesReport
+  Input dataset=sales line=3
+  Clean dataset=sales line=4
+  Filter dataset=sales line=5
+    Binary: >=
+      Identifier: revenue
+      Float: 1000.50
+  Sort dataset=sales field=revenue order=descending line=6
+  Group dataset=sales field=region line=7
+  Aggregate dataset=sales field=revenue function=sum line=8
+  Output dataset=sales line=9

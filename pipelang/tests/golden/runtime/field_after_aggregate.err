@@ -1,0 +1,1 @@
+semantic error at line 5: field 'marks' is not a column of dataset 'scores' (columns: team, sum_marks)

@@ -1,0 +1,16 @@
+Output orders (4 rows)
+region,sum_amount
+East,410
+North,380
+South,145.25
+West,530.75
+
+Output customers (7 rows)
+customer_id,name,city,age
+1,ASHA RAO,PUNE,34
+2,BEN OKAFOR,LAGOS,27
+4,DIVYA NAIR,KOCHI,45
+6,FARHAN ALI,KARACHI,31
+7,GRACE KIM,SEOUL,22
+8,HUGO SILVA,PORTO,58
+9,"IYER, KAVYA",CHENNAI,29

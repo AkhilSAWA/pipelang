@@ -1,0 +1,7 @@
+Optimization
+[redundant-sort] line 3: removed sort of 'scores' by 'team': group (line 4) orders by 'team' again
+Instructions: 4 -> 3
+Optimized Intermediate Representation
+[0] INPUT dataset=scores
+[1] GROUP dataset=scores field=team
+[2] OUTPUT dataset=scores

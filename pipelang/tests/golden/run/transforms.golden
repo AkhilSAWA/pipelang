@@ -1,0 +1,10 @@
+Output scores (8 rows)
+name,team,marks,bonus,row_number,grade
+GRACE,GREEN,99,5,1,A
+ASHA,RED,91,5,2,A
+DIVYA,GREEN,85,,3,B
+BEN,BLUE,72,0,4,C
+HUGO,RED,72,4,5,C
+ELIF,BLUE,64,2,6,D
+FARHAN,,58,1,7,F
+CHEN,RED,,3,8,

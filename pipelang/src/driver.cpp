@@ -18,7 +18,7 @@ bool Driver::parse_file(const std::string& path) {
     std::ifstream input(path);
 
     if (!input) {
-        error(0, "cannot open file: " + path);
+        report(DiagnosticKind::General, 0, "cannot open file: " + path);
         return false;
     }
 
@@ -31,7 +31,7 @@ bool Driver::parse_stream(
 ) {
     program_.reset();
     tokens_.clear();
-    errors_.clear();
+    diagnostics_.clear();
 
     std::ostringstream buffer;
     buffer << input.rdbuf();
@@ -47,11 +47,11 @@ bool Driver::parse_stream(
 
     yy_delete_buffer(scanner_buffer);
 
-    if (result != 0 && errors_.empty()) {
-        error(0, "parser failed for " + source_name);
+    if (result != 0 && diagnostics_.empty()) {
+        report(DiagnosticKind::General, 0, "parser failed for " + source_name);
     }
 
-    return result == 0 && errors_.empty() && program_ != nullptr;
+    return result == 0 && !has_errors(diagnostics_) && program_ != nullptr;
 }
 
 void Driver::set_program(PipelinePtr program) {
@@ -64,10 +64,6 @@ const Pipeline* Driver::program() const {
 
 void Driver::set_dump_tokens(bool enabled) {
     dump_tokens_ = enabled;
-}
-
-const std::vector<TokenRecord>& Driver::tokens() const {
-    return tokens_;
 }
 
 void Driver::note_token(
@@ -84,18 +80,8 @@ void Driver::note_token(
     }
 }
 
-void Driver::error(int line, const std::string& message) {
-    const std::string prefix =
-        line > 0 ? "line " + std::to_string(line) + ": " : "";
-
-    errors_.push_back(prefix + message);
-}
-
-const std::vector<std::string>& Driver::errors() const {
-    return errors_;
-}
-
 void Driver::print_tokens(std::ostream& output) const {
+    output << "Tokens\n";
     for (const auto& token : tokens_) {
         output << token.line
                << "  "
@@ -104,6 +90,14 @@ void Driver::print_tokens(std::ostream& output) const {
                << token.lexeme
                << '\n';
     }
+}
+
+void Driver::report(DiagnosticKind kind, int line, std::string message) {
+    diagnostics_.push_back({kind, line, std::move(message)});
+}
+
+const std::vector<Diagnostic>& Driver::diagnostics() const {
+    return diagnostics_;
 }
 
 }  // namespace pipelang

@@ -1,0 +1,4 @@
+pipeline Unterminated {
+    input unterminated
+    output unterminated
+}

@@ -1,0 +1,6 @@
+pipeline AggregateMinString {
+    input scores
+    group scores by team
+    aggregate scores by name min
+    output scores
+}

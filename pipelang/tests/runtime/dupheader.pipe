@@ -1,0 +1,4 @@
+pipeline DupHeader {
+    input dupheader
+    output dupheader
+}

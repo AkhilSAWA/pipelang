@@ -1,4 +1,4 @@
 Pipeline: Comments
-  Input dataset=logs
-  Clean dataset=logs
-  Output dataset=logs
+  Input dataset=logs line=3
+  Clean dataset=logs line=6
+  Output dataset=logs line=7

@@ -1,53 +1,39 @@
 #include "pipelang/symbol_table.hpp"
 
-#include <algorithm>
 #include <iomanip>
-#include <utility>
-#include <vector>
 
 namespace pipelang {
 
-bool SymbolTable::insert(
-    std::string name,
-    std::size_t declaration_index,
-    int declaration_line
-) {
-    // Copy the key first: argument evaluation order is unspecified, so using
-    // `name` as the key and `std::move(name)` in the same call can leave the
-    // key empty (GCC evaluates right-to-left).
-    std::string key = name;
-    const auto result = symbols_.emplace(
-        std::move(key),
-        Symbol{std::move(name), declaration_index, declaration_line}
-    );
-    return result.second;
+bool SymbolTable::declare(const std::string& name, int declaration_line) {
+    const bool inserted = index_.emplace(name, symbols_.size()).second;
+    if (inserted) {
+        symbols_.push_back({name, declaration_line, 0});
+    }
+    return inserted;
+}
+
+Symbol* SymbolTable::find(const std::string& name) {
+    const auto iterator = index_.find(name);
+    return iterator == index_.end() ? nullptr : &symbols_[iterator->second];
 }
 
 const Symbol* SymbolTable::find(const std::string& name) const {
-    const auto iterator = symbols_.find(name);
-    return iterator == symbols_.end() ? nullptr : &iterator->second;
-}
-
-bool SymbolTable::contains(const std::string& name) const {
-    return find(name) != nullptr;
+    const auto iterator = index_.find(name);
+    return iterator == index_.end() ? nullptr : &symbols_[iterator->second];
 }
 
 void SymbolTable::print(std::ostream& output) const {
-    std::vector<const Symbol*> ordered;
-    ordered.reserve(symbols_.size());
-    for (const auto& entry : symbols_) {
-        ordered.push_back(&entry.second);
-    }
-    std::sort(ordered.begin(), ordered.end(), [](const Symbol* left, const Symbol* right) {
-        return left->declaration_index < right->declaration_index;
-    });
-
     output << "Symbol Table\n"
            << std::left << std::setw(20) << "Dataset"
-           << "Declaration statement\n";
-    for (const Symbol* symbol : ordered) {
-        output << std::left << std::setw(20) << symbol->name
-               << symbol->declaration_index + 1 << '\n';
+           << std::setw(14) << "Declared at"
+           << "Output at\n";
+    for (const Symbol& symbol : symbols_) {
+        const std::string output_line = symbol.output_line > 0
+            ? "line " + std::to_string(symbol.output_line)
+            : "-";
+        output << std::left << std::setw(20) << symbol.name
+               << std::setw(14) << "line " + std::to_string(symbol.declaration_line)
+               << output_line << '\n';
     }
 }
 

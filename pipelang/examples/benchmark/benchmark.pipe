@@ -1,0 +1,37 @@
+// Four independent datasets, used to measure parallel and optimized execution.
+// Run it with scripts/benchmark.sh, or generate data next to this file first:
+//   ./build/pipelang_datagen examples/benchmark/data 200000
+pipeline Benchmark {
+    input orders
+    input customers
+    input events
+    input payments
+
+    clean orders
+    sort orders by amount descending
+    filter orders where amount > 250 and status == "delivered"
+    group orders by region
+    aggregate orders by amount avg
+    output orders
+
+    clean customers
+    sort customers by name
+    filter customers where age >= 30
+    transform customers uppercase
+    sort customers by city
+    output customers
+
+    clean events
+    sort events by duration descending
+    filter events where duration > 1000
+    group events by kind
+    aggregate events by duration max
+    output events
+
+    clean payments
+    filter payments where amount > 10
+    sort payments by amount
+    group payments by method
+    aggregate payments by amount count
+    output payments
+}

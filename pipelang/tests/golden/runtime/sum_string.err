@@ -1,0 +1,1 @@
+semantic error at line 4: aggregate function 'sum' needs a number column, but 'team' is a string column

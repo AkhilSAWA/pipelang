@@ -1,0 +1,5 @@
+pipeline StringArithmetic {
+    input sales
+    filter sales where region + "x" == "northx"
+    output sales
+}

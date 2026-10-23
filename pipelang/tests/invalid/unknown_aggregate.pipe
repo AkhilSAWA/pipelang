@@ -1,0 +1,5 @@
+pipeline UnknownAggregate {
+    input sales
+    aggregate sales by revenue total
+    output sales
+}

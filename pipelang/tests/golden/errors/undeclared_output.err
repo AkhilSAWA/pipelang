@@ -1,0 +1,1 @@
+semantic error at line 3: dataset 'inventory' is used by an operation before it is declared with input

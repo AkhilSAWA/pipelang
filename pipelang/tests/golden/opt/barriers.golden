@@ -1,0 +1,15 @@
+Optimization
+No optimizations applied.
+Instructions: 11 -> 11
+Optimized Intermediate Representation
+[0] INPUT dataset=scores
+[1] SORT dataset=scores field=marks order=descending
+[2] TRANSFORM dataset=scores function=add_row_number
+[3] FILTER dataset=scores condition=(row_number <= 5)
+[4] TRANSFORM dataset=scores function=calculate_grade
+[5] FILTER dataset=scores condition=((grade == "A") or (marks < 70))
+[6] TRANSFORM dataset=scores function=uppercase
+[7] FILTER dataset=scores condition=(team != "BLUE")
+[8] CLEAN dataset=scores
+[9] SORT dataset=scores field=name order=ascending
+[10] OUTPUT dataset=scores

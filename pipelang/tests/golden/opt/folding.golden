@@ -1,0 +1,18 @@
+Optimization
+[constant-folding] line 4: `(x > ((2 * 3) + 1))` -> `(x > 7)`
+[constant-folding] line 5: `((1 < 2) and (y == "a"))` -> `(y == "a")`
+[constant-folding] line 6: `((-(4 - 1) < z) or ((10 / 4) > 3))` -> `(-3 < z)`
+[constant-folding] line 7: `(5 > 1)` -> `true`
+[constant-folding] line 9: `(("b" < "a") and (w > 0))` -> `false`
+[dead-code] line 7: removed filter on 's' whose condition is always true
+[dead-code] line 9: note: filter on 't' is always false, so the dataset will be empty
+[filter-merge] line 5: merged filter (line 5) into filter (line 4) on 's'
+[filter-merge] line 6: merged filter (line 6) into filter (line 4) on 's'
+Instructions: 9 -> 6
+Optimized Intermediate Representation
+[0] INPUT dataset=s
+[1] INPUT dataset=t
+[2] FILTER dataset=s condition=(((x > 7) and (y == "a")) and (-3 < z))
+[3] OUTPUT dataset=s
+[4] FILTER dataset=t condition=false
+[5] OUTPUT dataset=t

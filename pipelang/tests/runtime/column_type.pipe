@@ -1,0 +1,5 @@
+pipeline ColumnType {
+    input scores
+    filter scores where team > 5
+    output scores
+}

@@ -1,0 +1,2 @@
+semantic error at line 2: dataset 'orders' is used by an operation before it is declared with input
+semantic error at line 4: 'and' combines two comparisons, got comparison and field

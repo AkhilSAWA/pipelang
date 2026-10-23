@@ -1,0 +1,6 @@
+Output sales (4 rows)
+region,sum_revenue
+East,3550.75
+North,3350.5
+South,3210.25
+West,2300.4

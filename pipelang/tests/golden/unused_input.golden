@@ -1,0 +1,5 @@
+Compiled pipeline: UnusedInput
+Semantic analysis: PASSED
+IR instructions: 4
+DAG edges: 2
+Execution levels: 2

@@ -1,0 +1,26 @@
+digraph "SalesReport" {
+  label="SalesReport";
+  labelloc=t;
+  fontname="Helvetica";
+  rankdir=TB;
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=11, color="#64748b"];
+  edge [color="#64748b", arrowsize=0.7];
+  subgraph "cluster_0" {
+    label="sales";
+    style="rounded,dashed";
+    color="#94a3b8";
+    n0 [label="[0] INPUT", fillcolor="#dbeafe"];
+    n1 [label="[1] CLEAN", fillcolor="#dcfce7"];
+    n2 [label="[2] FILTER\n(revenue >= 1000.50)", fillcolor="#fef3c7"];
+    n3 [label="[3] SORT\nby revenue descending", fillcolor="#fce7f3"];
+    n4 [label="[4] GROUP\nby region", fillcolor="#fce7f3"];
+    n5 [label="[5] AGGREGATE\nsum(revenue)", fillcolor="#ffedd5"];
+    n6 [label="[6] OUTPUT", fillcolor="#dbeafe"];
+  }
+  n0 -> n1;
+  n1 -> n2;
+  n2 -> n3;
+  n3 -> n4;
+  n4 -> n5;
+  n5 -> n6;
+}

@@ -1,0 +1,24 @@
+// Phase 3 demo: three datasets and several optimization opportunities.
+pipeline StoreAnalytics {
+    input orders
+    input customers
+    input returns                               # never output: dead code
+
+    clean orders
+    sort orders by amount descending            # aggregate ignores row order
+    filter orders where amount > 50 * 2         # constant folding
+    filter orders where status == "delivered"   # merged with the filter above
+    group orders by region
+    aggregate orders by amount sum
+    output orders
+
+    clean customers
+    filter customers where age >= 18
+    clean customers                             # rows are already clean
+    transform customers uppercase
+    sort customers by name
+    output customers
+
+    clean returns
+    filter returns where reason == "damaged"
+}

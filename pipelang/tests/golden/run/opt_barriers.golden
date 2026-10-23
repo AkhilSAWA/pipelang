@@ -1,0 +1,4 @@
+Output scores (2 rows)
+name,team,marks,bonus,row_number,grade
+ASHA,RED,91,5,2,A
+GRACE,GREEN,99,5,1,A

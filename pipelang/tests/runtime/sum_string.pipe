@@ -1,0 +1,6 @@
+pipeline SumString {
+    input scores
+    group scores by marks
+    aggregate scores by team sum
+    output scores
+}

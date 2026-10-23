@@ -1,0 +1,5 @@
+pipeline UnknownTransform {
+    input scores
+    transform scores normalize
+    output scores
+}

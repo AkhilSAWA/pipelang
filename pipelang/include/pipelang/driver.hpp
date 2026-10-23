@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "pipelang/ast.hpp"
+#include "pipelang/diagnostic.hpp"
 
 namespace pipelang {
 
@@ -15,6 +16,8 @@ struct TokenRecord {
     int line;
 };
 
+// Runs the Flex lexer and Bison parser over one source file and collects the
+// resulting AST, lexical/syntax diagnostics and (optionally) the token stream.
 class Driver {
 public:
     bool parse_file(const std::string& path);
@@ -24,18 +27,17 @@ public:
     const Pipeline* program() const;
 
     void set_dump_tokens(bool enabled);
-    const std::vector<TokenRecord>& tokens() const;
     void note_token(std::string kind, std::string lexeme, int line);
-
-    void error(int line, const std::string& message);
-    const std::vector<std::string>& errors() const;
     void print_tokens(std::ostream& output) const;
+
+    void report(DiagnosticKind kind, int line, std::string message);
+    const std::vector<Diagnostic>& diagnostics() const;
 
 private:
     PipelinePtr program_;
     bool dump_tokens_ = false;
     std::vector<TokenRecord> tokens_;
-    std::vector<std::string> errors_;
+    std::vector<Diagnostic> diagnostics_;
 };
 
 }  // namespace pipelang

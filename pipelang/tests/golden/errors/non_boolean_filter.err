@@ -1,0 +1,1 @@
+semantic error at line 3: filter condition must be a comparison such as `marks > 75`, but `(revenue * 2)` is a number

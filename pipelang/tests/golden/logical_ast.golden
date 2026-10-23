@@ -1,0 +1,20 @@
+Pipeline: Logical
+  Input dataset=students line=2
+  Filter dataset=students line=3
+    Binary: or
+      Binary: and
+        Binary: >=
+          Identifier: marks
+          Integer: 60
+        Binary: >
+          Identifier: attendance
+          Float: 0.75
+      Binary: ==
+        Identifier: name
+        String: "topper"
+  Filter dataset=students line=4
+    Binary: >
+      Identifier: delta
+      Unary: -
+        Integer: 5
+  Output dataset=students line=5

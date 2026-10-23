@@ -1,0 +1,5 @@
+pipeline AggregateMaxUngrouped {
+    input scores
+    aggregate scores by marks max
+    output scores
+}

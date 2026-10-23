@@ -1,67 +1,18 @@
 # PipeLang
 
-PipeLang is a C++20 domain-specific language and compiler prototype for describing data-processing pipelines.
+A domain-specific compiler for data-processing pipeline analysis and optimization (C++20, Flex, Bison, CMake).
 
-```text
-PipeLang source -> Flex lexer -> Bison parser -> AST
-                -> semantic analysis -> IR -> dependency DAG
-                -> optimization -> execution
-```
+PipeLang parses a pipeline, checks it, builds a dependency DAG, optimizes it, and runs it on CSV data,
+in parallel where datasets are independent. It can draw the result as a Graphviz graph and as a
+self-contained HTML report.
 
-This Phase 2 baseline implements a working Flex lexer, Bison LALR parser, custom C++ AST, command-line driver, examples, and CTest smoke tests.
-
-## Requirements
-
-- CMake 3.20+
-- C++20 compiler
-- Flex 2.6+
-- Bison 3.0+
-
-Ubuntu/Debian:
+The project lives in [`pipelang/`](pipelang/):
+- [`pipelang/README.md`](pipelang/README.md): the language, build steps and usage.
+- [`docs/phase2_progress.md`](pipelang/docs/phase2_progress.md) and
+  [`docs/phase3_progress.md`](pipelang/docs/phase3_progress.md): what each phase delivered.
 
 ```bash
-sudo apt install build-essential cmake flex bison
+cd pipelang
+cmake -S . -B build && cmake --build build && ctest --test-dir build --output-on-failure
+sh scripts/demo.sh        # writes demo/store_report.html and the rendered DAG
 ```
-
-## Build and test
-
-Run from this `pipelang/` directory:
-
-```bash
-cmake -S . -B build
-cmake --build build
-ctest --test-dir build --output-on-failure
-```
-
-Or:
-
-```bash
-sh scripts/build.sh
-```
-
-## Run
-
-```bash
-./build/pipelangc examples/student_analysis.pipe
-./build/pipelangc --dump-ast examples/student_analysis.pipe
-./build/pipelangc --dump-tokens --dump-ast examples/sales.pipe
-```
-
-## Supported syntax
-
-| Operation | Syntax |
-| --- | --- |
-| Input | `input dataset` |
-| Clean | `clean dataset` |
-| Filter | `filter dataset where expression` |
-| Transform | `transform dataset function` |
-| Sort | `sort dataset by field [ascending\|descending]` |
-| Group | `group dataset by field` |
-| Aggregate | `aggregate dataset by field function` |
-| Output | `output dataset` |
-
-Expressions support identifiers, integer/float/string literals, parentheses, comparison operators, and `+`, `-`, `*`, `/`. A semicolon is optional after a statement.
-
-## Next milestone
-
-The next Phase 2 milestone is semantic analysis using a symbol table, followed by a custom IR and dependency DAG. That DAG will support later optimization, Graphviz visualization, redundancy detection, and possible parallel execution.

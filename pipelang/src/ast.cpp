@@ -37,6 +37,19 @@ ExprPtr make_string(std::string value) {
     return std::make_unique<Expr>(ExprKind::String, std::move(value));
 }
 
+ExprPtr make_boolean(bool value) {
+    return std::make_unique<Expr>(ExprKind::Boolean, value ? "true" : "false");
+}
+
+ExprPtr make_unary(std::string op, ExprPtr operand) {
+    return std::make_unique<Expr>(
+        ExprKind::Unary,
+        std::move(op),
+        std::move(operand),
+        nullptr
+    );
+}
+
 ExprPtr make_binary(std::string op, ExprPtr left, ExprPtr right) {
     return std::make_unique<Expr>(
         ExprKind::Binary,
@@ -44,6 +57,34 @@ ExprPtr make_binary(std::string op, ExprPtr left, ExprPtr right) {
         std::move(left),
         std::move(right)
     );
+}
+
+ExprPtr clone_expr(const Expr& expression) {
+    return std::make_unique<Expr>(
+        expression.kind,
+        expression.value,
+        expression.left ? clone_expr(*expression.left) : nullptr,
+        expression.right ? clone_expr(*expression.right) : nullptr
+    );
+}
+
+std::string expr_to_string(const Expr& expression) {
+    switch (expression.kind) {
+        case ExprKind::String:
+            return '"' + expression.value + '"';
+        case ExprKind::Unary:
+            return expression.value + expr_to_string(*expression.left);
+        case ExprKind::Binary:
+            return "(" + expr_to_string(*expression.left) + " " +
+                   expression.value + " " +
+                   expr_to_string(*expression.right) + ")";
+        case ExprKind::Identifier:
+        case ExprKind::Integer:
+        case ExprKind::Float:
+        case ExprKind::Boolean:
+            break;
+    }
+    return expression.value;
 }
 
 StmtPtr make_input(std::string dataset, int line) {
@@ -60,7 +101,7 @@ StmtPtr make_filter(std::string dataset, ExprPtr condition, int line) {
         std::move(dataset),
         line
     );
-    statement->expression = std::move(condition);
+    statement->condition = std::move(condition);
     return statement;
 }
 
@@ -70,7 +111,7 @@ StmtPtr make_transform(std::string dataset, std::string function, int line) {
         std::move(dataset),
         line
     );
-    statement->argument = std::move(function);
+    statement->function = std::move(function);
     return statement;
 }
 
@@ -85,7 +126,7 @@ StmtPtr make_sort(
         std::move(dataset),
         line
     );
-    statement->argument = std::move(field);
+    statement->field = std::move(field);
     statement->order = order;
     return statement;
 }
@@ -96,7 +137,7 @@ StmtPtr make_group(std::string dataset, std::string field, int line) {
         std::move(dataset),
         line
     );
-    statement->argument = std::move(field);
+    statement->field = std::move(field);
     return statement;
 }
 
@@ -111,7 +152,8 @@ StmtPtr make_aggregate(
         std::move(dataset),
         line
     );
-    statement->argument = std::move(field) + " using " + std::move(function);
+    statement->field = std::move(field);
+    statement->function = std::move(function);
     return statement;
 }
 
@@ -121,12 +163,18 @@ StmtPtr make_output(std::string dataset, int line) {
 
 PipelinePtr make_pipeline(
     std::string name,
-    std::vector<StmtPtr> statements
+    std::vector<StmtPtr> statements,
+    int line
 ) {
     auto pipeline = std::make_unique<Pipeline>();
     pipeline->name = std::move(name);
     pipeline->statements = std::move(statements);
+    pipeline->line = line;
     return pipeline;
+}
+
+const char* sort_order_name(SortOrder order) {
+    return order == SortOrder::Ascending ? "ascending" : "descending";
 }
 
 namespace {
@@ -137,6 +185,8 @@ const char* expr_kind_name(ExprKind kind) {
         case ExprKind::Integer: return "Integer";
         case ExprKind::Float: return "Float";
         case ExprKind::String: return "String";
+        case ExprKind::Boolean: return "Boolean";
+        case ExprKind::Unary: return "Unary";
         case ExprKind::Binary: return "Binary";
     }
     return "Unknown";
@@ -158,12 +208,11 @@ const char* stmt_kind_name(StmtKind kind) {
 
 void print_expr(const Expr& expression, std::ostream& output, int indent) {
     const std::string padding(static_cast<std::size_t>(indent), ' ');
+    const std::string value = expression.kind == ExprKind::String
+        ? '"' + expression.value + '"'
+        : expression.value;
 
-    output << padding
-           << expr_kind_name(expression.kind)
-           << ": "
-           << expression.value
-           << '\n';
+    output << padding << expr_kind_name(expression.kind) << ": " << value << '\n';
 
     if (expression.left) {
         print_expr(*expression.left, output, indent + 2);
@@ -185,21 +234,22 @@ void print_ast(const Pipeline& pipeline, std::ostream& output) {
                << " dataset="
                << statement->dataset;
 
-        if (!statement->argument.empty()) {
-            output << " argument=" << statement->argument;
+        if (!statement->field.empty()) {
+            output << " field=" << statement->field;
+        }
+
+        if (!statement->function.empty()) {
+            output << " function=" << statement->function;
         }
 
         if (statement->kind == StmtKind::Sort) {
-            output << " order="
-                   << (statement->order == SortOrder::Ascending
-                       ? "ascending"
-                       : "descending");
+            output << " order=" << sort_order_name(statement->order);
         }
 
-        output << '\n';
+        output << " line=" << statement->line << '\n';
 
-        if (statement->expression) {
-            print_expr(*statement->expression, output, 4);
+        if (statement->condition) {
+            print_expr(*statement->condition, output, 4);
         }
     }
 }

@@ -1,0 +1,5 @@
+pipeline DivisionByZero {
+    input sales
+    filter sales where revenue / 0 > 1
+    output sales
+}

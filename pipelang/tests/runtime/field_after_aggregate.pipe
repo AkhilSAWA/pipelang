@@ -1,0 +1,7 @@
+pipeline SortMissing {
+    input scores
+    group scores by team
+    aggregate scores by marks sum
+    sort scores by marks
+    output scores
+}

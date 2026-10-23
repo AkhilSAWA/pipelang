@@ -1,0 +1,15 @@
+order_id,customer_id,region,amount,status
+1001,1,North,250.00,delivered
+1002,2,South,80.00,delivered
+1003,3,East,120.50,cancelled
+1004,1,North,99.99,delivered
+1005,4,West,310.00,delivered
+1006,5,South,145.25,delivered
+1007,2,South,,delivered
+1008,6,East,410.00,delivered
+1009,3,East,175.00,shipped
+1010,7,North,100.00,delivered
+1011,8,West,220.75,delivered
+1005,4,West,310.00,delivered
+1012,9,North,130.00,delivered
+1013,10,East,95.00,delivered

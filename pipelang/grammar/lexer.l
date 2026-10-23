@@ -1,5 +1,7 @@
 %option noyywrap nodefault yylineno nounput noinput
 
+%x BLOCK_COMMENT
+
 %{
 #include <string>
 
@@ -18,19 +20,26 @@
     } \
 }
 
-static std::string unquote(const char* text, int length) {
-    return std::string(
-        text + 1,
-        static_cast<std::size_t>(length - 2)
-    );
-}
+/* Records the token for --dump-tokens and hands it to the parser. */
+#define TOKEN(kind) do { \
+    driver.note_token(#kind, std::string(yytext, yyleng), yylineno); \
+    return kind; \
+} while (0)
+
+/* Value-carrying tokens also pass their text to the parser. */
+#define VALUE_TOKEN(kind, value) do { \
+    yylval->text = new std::string(value); \
+    TOKEN(kind); \
+} while (0)
+
+static int comment_start_line = 0;
 %}
 
 WHITESPACE  [ \t\r]+
 ID          [a-zA-Z_][a-zA-Z0-9_]*
 INTEGER     [0-9]+
 FLOAT       [0-9]+\.[0-9]+
-STRING      \"([^\\\"]|\\.)*\"
+STRING_BODY ([^\\\"\n]|\\.)*
 
 %%
 
@@ -39,70 +48,86 @@ STRING      \"([^\\\"]|\\.)*\"
 
 "//"[^\n]*                       ;
 "#"[^\n]*                        ;
-"/*"([^*]|\*+[^*/])*\*+"/"       ;
 
-"pipeline"                       return PIPELINE;
-"input"                          return INPUT;
-"clean"                          return CLEAN;
-"filter"                         return FILTER;
-"where"                          return WHERE;
-"transform"                      return TRANSFORM;
-"sort"                           return SORT;
-"group"                          return GROUP;
-"by"                             return BY;
-"aggregate"                      return AGGREGATE;
-"output"                         return OUTPUT;
-"ascending"                      return ASCENDING;
-"descending"                     return DESCENDING;
-
-">="                             return GREATER_EQUAL;
-"<="                             return LESS_EQUAL;
-"=="                             return EQUAL_EQUAL;
-"!="                             return NOT_EQUAL;
-">"                              return GREATER;
-"<"                              return LESS;
-"+"                              return PLUS;
-"-"                              return MINUS;
-"*"                              return STAR;
-"/"                              return SLASH;
-
-{FLOAT} {
-    yylval->text = new std::string(yytext, yyleng);
-    driver.note_token("FLOAT", *yylval->text, yylineno);
-    return FLOAT_LITERAL;
+"/*" {
+    comment_start_line = yylineno;
+    BEGIN(BLOCK_COMMENT);
+}
+<BLOCK_COMMENT>"*/"              BEGIN(INITIAL);
+<BLOCK_COMMENT>[^*\n]+           ;
+<BLOCK_COMMENT>"*"               ;
+<BLOCK_COMMENT>\n                ;
+<BLOCK_COMMENT><<EOF>> {
+    driver.report(
+        pipelang::DiagnosticKind::Lexical,
+        comment_start_line,
+        "unterminated block comment"
+    );
+    BEGIN(INITIAL);
+    return 0;
 }
 
-{INTEGER} {
-    yylval->text = new std::string(yytext, yyleng);
-    driver.note_token("INTEGER", *yylval->text, yylineno);
-    return INTEGER_LITERAL;
+"pipeline"                       TOKEN(PIPELINE);
+"input"                          TOKEN(INPUT);
+"clean"                          TOKEN(CLEAN);
+"filter"                         TOKEN(FILTER);
+"where"                          TOKEN(WHERE);
+"transform"                      TOKEN(TRANSFORM);
+"sort"                           TOKEN(SORT);
+"group"                          TOKEN(GROUP);
+"by"                             TOKEN(BY);
+"aggregate"                      TOKEN(AGGREGATE);
+"output"                         TOKEN(OUTPUT);
+"ascending"                      TOKEN(ASCENDING);
+"descending"                     TOKEN(DESCENDING);
+"and"                            TOKEN(AND);
+"or"                             TOKEN(OR);
+
+">="                             TOKEN(GREATER_EQUAL);
+"<="                             TOKEN(LESS_EQUAL);
+"=="                             TOKEN(EQUAL_EQUAL);
+"!="                             TOKEN(NOT_EQUAL);
+">"                              TOKEN(GREATER);
+"<"                              TOKEN(LESS);
+"+"                              TOKEN(PLUS);
+"-"                              TOKEN(MINUS);
+"*"                              TOKEN(STAR);
+"/"                              TOKEN(SLASH);
+
+"{"                              TOKEN(LBRACE);
+"}"                              TOKEN(RBRACE);
+"("                              TOKEN(LPAREN);
+")"                              TOKEN(RPAREN);
+";"                              TOKEN(SEMICOLON);
+
+{FLOAT}                          VALUE_TOKEN(FLOAT_LITERAL, yytext);
+{INTEGER}                        VALUE_TOKEN(INTEGER_LITERAL, yytext);
+{ID}                             VALUE_TOKEN(IDENTIFIER, yytext);
+
+\"{STRING_BODY}\" {
+    /* Strip the surrounding quotes; escape sequences are kept as written. */
+    VALUE_TOKEN(
+        STRING_LITERAL,
+        std::string(yytext + 1, static_cast<std::size_t>(yyleng - 2))
+    );
 }
 
-{STRING} {
-    yylval->text = new std::string(unquote(yytext, yyleng));
-    driver.note_token("STRING", *yylval->text, yylineno);
-    return STRING_LITERAL;
+\"{STRING_BODY} {
+    driver.report(
+        pipelang::DiagnosticKind::Lexical,
+        yylineno,
+        "unterminated string literal"
+    );
 }
-
-{ID} {
-    yylval->text = new std::string(yytext, yyleng);
-    driver.note_token("ID", *yylval->text, yylineno);
-    return IDENTIFIER;
-}
-
-"{"                              return LBRACE;
-"}"                              return RBRACE;
-"("                              return LPAREN;
-")"                              return RPAREN;
-";"                              return SEMICOLON;
-","                              return COMMA;
 
 . {
-    driver.error(
+    /* Report the character and keep scanning, so one stray character does
+       not hide later errors. The driver fails the compilation afterwards. */
+    driver.report(
+        pipelang::DiagnosticKind::Lexical,
         yylineno,
         std::string("unexpected character '") + yytext[0] + "'"
     );
-    return INVALID;
 }
 
 %%

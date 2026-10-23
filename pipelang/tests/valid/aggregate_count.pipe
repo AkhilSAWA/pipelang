@@ -1,0 +1,6 @@
+pipeline AggregateCount {
+    input scores
+    group scores by team
+    aggregate scores by marks count
+    output scores
+}

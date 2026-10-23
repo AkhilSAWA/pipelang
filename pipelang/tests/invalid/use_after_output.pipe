@@ -1,0 +1,5 @@
+pipeline UseAfterOutput {
+    input sales
+    output sales
+    filter sales where revenue > 10
+}

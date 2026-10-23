@@ -1,0 +1,7 @@
+Output edge (4 rows)
+id,label,note,amount
+1,plain,"has, comma",10
+2,"quote ""inside""","multi
+line",-2.5
+3,,"  padded  ",1000
+4,007,,

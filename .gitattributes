@@ -1,3 +1,5 @@
 # Keep Unix line endings so scripts and Flex/Bison files work in WSL/Linux
 * text=auto eol=lf
 *.sh text eol=lf
+# CSV fixtures test CRLF and other raw bytes; keep them exactly as written
+pipelang/tests/data/*.csv -text

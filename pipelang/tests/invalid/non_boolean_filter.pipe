@@ -1,0 +1,5 @@
+pipeline NonBooleanFilter {
+    input sales
+    filter sales where revenue * 2
+    output sales
+}

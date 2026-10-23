@@ -1,0 +1,11 @@
+Optimization
+[filter-pushdown] line 6: moved filter on 'scores' before sort (line 5), transform (line 4), sort (line 3) so later operations see fewer rows
+[redundant-sort] line 3: removed sort of 'scores' by 'marks': sort (line 7) orders by 'marks' again
+Instructions: 7 -> 6
+Optimized Intermediate Representation
+[0] INPUT dataset=scores
+[1] FILTER dataset=scores condition=(marks >= 60)
+[2] TRANSFORM dataset=scores function=calculate_grade
+[3] SORT dataset=scores field=name order=descending
+[4] SORT dataset=scores field=marks order=descending
+[5] OUTPUT dataset=scores

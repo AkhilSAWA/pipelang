@@ -1,0 +1,13 @@
+id,region,product,revenue
+1,North,Laptop,1250.00
+2,South,Phone,980.50
+3,East,Tablet,1500.75
+4,North,Phone,1100.00
+5,West,Laptop,2300.40
+6,South,Laptop,1890.00
+7,East,Phone,
+8,North,Tablet,1000.50
+9,West,Phone,999.99
+4,North,Phone,1100.00
+10,South,Tablet,1320.25
+11,East,Laptop,2050.00

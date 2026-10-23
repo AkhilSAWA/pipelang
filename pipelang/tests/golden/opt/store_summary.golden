@@ -1,0 +1,6 @@
+Compiled pipeline: StoreAnalytics
+Semantic analysis: PASSED
+IR instructions: 18
+Optimized instructions: 12 (8 optimization steps)
+DAG edges: 10
+Execution levels: 6

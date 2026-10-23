@@ -1,0 +1,11 @@
+pipeline Folding {
+    input s
+    input t
+    filter s where x > 2 * 3 + 1
+    filter s where 1 < 2 and y == "a"
+    filter s where -(4 - 1) < z or 10 / 4 > 3
+    filter s where 5 > 1
+    output s
+    filter t where "b" < "a" and w > 0
+    output t
+}

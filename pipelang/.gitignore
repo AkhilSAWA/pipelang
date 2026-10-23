@@ -24,3 +24,8 @@ lexer.cpp
 *.obj
 *.exe
 pipelangc
+
+# Generated benchmark data and run outputs
+/examples/benchmark/data/
+/out/
+/demo/

@@ -1,0 +1,9 @@
+Output students (7 rows)
+id,name,department,marks,attendance,grade
+1,Asha Rao,CS,92,0.95,A
+3,Chen Li,CS,81,0.88,B
+9,Isha Patel,CS,76,0.85,C
+5,Elif Kaya,EE,88,0.97,B
+11,Kavya Iyer,EE,79,0.9,C
+4,Divya Nair,ME,77,0.91,C
+7,Grace Kim,ME,95,0.99,A

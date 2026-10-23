@@ -1,0 +1,40 @@
+digraph "StoreAnalytics" {
+  label="StoreAnalytics";
+  labelloc=t;
+  fontname="Helvetica";
+  rankdir=TB;
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=11, color="#64748b"];
+  edge [color="#64748b", arrowsize=0.7];
+  subgraph "cluster_0" {
+    label="orders";
+    style="rounded,dashed";
+    color="#94a3b8";
+    n0 [label="[0] INPUT", fillcolor="#dbeafe"];
+    n2 [label="[2] FILTER\n((amount > 100) and (status == \"delivered\"))", fillcolor="#fef3c7"];
+    n3 [label="[3] CLEAN", fillcolor="#dcfce7"];
+    n4 [label="[4] GROUP\nby region", fillcolor="#fce7f3"];
+    n5 [label="[5] AGGREGATE\nsum(amount)", fillcolor="#ffedd5"];
+    n6 [label="[6] OUTPUT", fillcolor="#dbeafe"];
+  }
+  subgraph "cluster_1" {
+    label="customers";
+    style="rounded,dashed";
+    color="#94a3b8";
+    n1 [label="[1] INPUT", fillcolor="#dbeafe"];
+    n7 [label="[7] FILTER\n(age >= 18)", fillcolor="#fef3c7"];
+    n8 [label="[8] CLEAN", fillcolor="#dcfce7"];
+    n9 [label="[9] TRANSFORM\nuppercase", fillcolor="#ede9fe"];
+    n10 [label="[10] SORT\nby name ascending", fillcolor="#fce7f3"];
+    n11 [label="[11] OUTPUT", fillcolor="#dbeafe"];
+  }
+  n0 -> n2;
+  n2 -> n3;
+  n3 -> n4;
+  n4 -> n5;
+  n5 -> n6;
+  n1 -> n7;
+  n7 -> n8;
+  n8 -> n9;
+  n9 -> n10;
+  n10 -> n11;
+}

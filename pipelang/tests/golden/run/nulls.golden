@@ -1,0 +1,7 @@
+Output scores (5 rows)
+name,team,marks,bonus
+Ben,Blue,72,0
+Chen,Red,,3
+Elif,Blue,64,2
+Farhan,,58,1
+Hugo,Red,72,4

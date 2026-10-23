@@ -1,0 +1,5 @@
+Compiled pipeline: SalesReport
+Semantic analysis: PASSED
+IR instructions: 7
+DAG edges: 6
+Execution levels: 7

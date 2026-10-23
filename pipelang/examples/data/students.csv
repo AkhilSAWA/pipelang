@@ -1,0 +1,13 @@
+id,name,department,marks,attendance
+1,Asha Rao,CS,92,0.95
+2,Ben Okafor,EE,68,0.80
+3,Chen Li,CS,81,0.88
+4,Divya Nair,ME,77,0.91
+5,Elif Kaya,EE,88,0.97
+6,Farhan Ali,CS,59,0.70
+7,Grace Kim,ME,95,0.99
+8,Hugo Silva,EE,,0.65
+3,Chen Li,CS,81,0.88
+9,Isha Patel,CS,76,0.85
+10,Jonas Berg,ME,83,
+11,Kavya Iyer,EE,79,0.90

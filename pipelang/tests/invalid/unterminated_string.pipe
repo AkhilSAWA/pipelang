@@ -1,0 +1,5 @@
+pipeline UnterminatedString {
+    input sales
+    filter sales where region == "north
+    output sales
+}

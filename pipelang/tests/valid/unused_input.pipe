@@ -1,0 +1,6 @@
+pipeline UnusedInput {
+    input sales
+    input archive
+    clean archive
+    output sales
+}

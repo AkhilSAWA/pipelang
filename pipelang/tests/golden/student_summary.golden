@@ -1,0 +1,5 @@
+Compiled pipeline: StudentAnalysis
+Semantic analysis: PASSED
+IR instructions: 6
+DAG edges: 5
+Execution levels: 6

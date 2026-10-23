@@ -1,0 +1,6 @@
+pipeline Logical {
+    input students
+    filter students where (marks >= 60 and attendance > 0.75) or name == "topper"
+    filter students where delta > -5
+    output students
+}

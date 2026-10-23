@@ -1,0 +1,1 @@
+semantic error at line 3: unknown aggregate function 'total'; expected one of: sum, avg, count, min, max

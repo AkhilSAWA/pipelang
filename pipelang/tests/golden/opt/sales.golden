@@ -1,0 +1,11 @@
+Optimization
+[filter-pushdown] line 5: moved filter on 'sales' before clean (line 4) so later operations see fewer rows
+[redundant-sort] line 6: removed sort of 'sales' by 'revenue': aggregate (line 8) does not depend on row order
+Instructions: 7 -> 6
+Optimized Intermediate Representation
+[0] INPUT dataset=sales
+[1] FILTER dataset=sales condition=(revenue >= 1000.50)
+[2] CLEAN dataset=sales
+[3] GROUP dataset=sales field=region
+[4] AGGREGATE dataset=sales field=revenue function=sum
+[5] OUTPUT dataset=sales
